@@ -1,4 +1,4 @@
-# tfx-addons-feast-examplegen
+<!-- # tfx-addons-feast-examplegen
 Examplegen for Feast Feature Store
 
 ## (WIP) Setup
@@ -33,4 +33,4 @@ pip install --upgrade --force --no-dependencies https://github.com/apple/tensorf
 
 python -m pip install tensorflow-macos
 
-```
+``` -->
