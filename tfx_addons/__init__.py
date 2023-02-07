@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 """Init module for TFX."""
-
+print('Hello from init')
 import importlib as _importlib
 
 from .version import _PKG_METADATA, __version__
