@@ -24,13 +24,25 @@ When the use case is a time series problem using sliding windows, shuffling befo
 Almost impossible to use ExampleGen based components for large datasets. Without it, Beam knows how to write to disk after transforming from input format to output format, allowing it to transform (slowly) large datasets that would otherwise not fit into memory. Link.
 
 ## Project Implementation
-Use case #1 - Tfrecords as input URIs:
+Stage #1 - Convert a single tfrecord file to an Examples Artifact without shuffling the data:
+This component will:
+1. Retrieve the tfrecord
+2. Define a way to convert a tfrecord to Examples Artifact with Beam job that skips shuffling
+2.a Create a standard artifact for ExamplesTfrecord
+3. Output as 'examples' to be ingested from downstream components
+
+Stage #2 - Convert a single tfrecord file to an Examples Artifact without shuffling the data and without splitting:
+This component will:
+1. Retrieve the tfrecord
+2. Define a way to convert a tfrecord to Examples Artifact with Beam job that skips shuffling and creates only one split
+3. Output as 'examples' to be ingested from downstream components
+
+Stage #3 - Convert two tfrecord files to a single Examples Artifact without shuffling the data. Specifying the splits per tfrecord file:
 This component will:
 1. Accept a dict i.e. {'split_name1': './path/to/split_name1/tfrecord1', 'split_name2': './path/to/split_name2/tfrecord2'}
 2. Retrieve the tfrecords
-3. Create an Examples Artifact, following Examples directory structure and properties required for an Examples Artifact
-4. Register the Examples Artifact into MLMD
-5. Output as 'examples' to be ingested from downstream components
+2. Define a way to convert a tfrecord to Examples Artifact with Beam job that skips shuffling and creates two splits titled by the key
+6. Output as 'examples' to be ingested from downstream components
 
 
 ## Project Dependencies
