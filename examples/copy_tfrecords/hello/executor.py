@@ -35,6 +35,8 @@ from tfx.utils import io_utils
 class Executor(base_executor.BaseExecutor):
   """Executor for HelloComponent."""
 
+  
+
   def Do(self, input_dict: Dict[str, List[types.Artifact]],
          output_dict: Dict[str, List[types.Artifact]],
          exec_properties: Dict[str, Any]) -> None:
@@ -64,6 +66,9 @@ class Executor(base_executor.BaseExecutor):
     Raises:
       OSError and its subclasses
     """
+
+    print("From executor.py: " + str(exec_properties))
+
     self._log_startup(input_dict, output_dict, exec_properties)
 
     input_artifact = artifact_utils.get_single_instance(

@@ -39,7 +39,8 @@ class HelloComponentSpec(types.ComponentSpec):
   PARAMETERS = {
       # These are parameters that will be passed in the call to
       # create an instance of this component.
-      'name': ExecutionParameter(type=str),
+      'name': ExecutionParamseter(type=str),
+      'splits': ExecutionParameter(type=dict)
   }
   INPUTS = {
       # This will be a dictionary with input artifacts, including URIs
@@ -63,7 +64,8 @@ class HelloComponent(base_component.BaseComponent):
   def __init__(self,
                input_data: types.Channel = None,
                output_data: types.Channel = None,
-               name: Optional[str] = None):
+               name: Optional[str] = None,
+               splits: Optional[dict] = None):
     """Construct a HelloComponent.
 
     Args:
@@ -83,5 +85,7 @@ class HelloComponent(base_component.BaseComponent):
       output_data = channel_utils.as_channel([standard_artifacts.Examples()])
 
     spec = HelloComponentSpec(input_data=input_data,
-                              output_data=output_data, name=name)
+                              output_data=output_data,
+                              name=name,
+                              splits=splits)
     super().__init__(spec=spec)

@@ -96,6 +96,9 @@ def _prepare_artifact(
           ('Custom property value for key %r must be a string or integer '
            '(got %r instead)') % (key, value))
 
+  """
+  Believe this is where the copying happens @michael
+  """
   unfiltered_previous_artifacts = metadata_handler.get_artifacts_by_uri(uri)
   new_artifact_type = False
   if mlmd_artifact_type and not mlmd_artifact_type.id:
@@ -105,6 +108,9 @@ def _prepare_artifact(
     except errors.NotFoundError:
       # Artifact type is not registered, so it must be new.
       new_artifact_type = True
+  """
+  Believe this is where the copying happens @michael
+  """
 
   result = output_artifact_class(mlmd_artifact_type)
   result.uri = uri
