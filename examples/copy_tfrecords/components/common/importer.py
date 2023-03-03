@@ -24,6 +24,7 @@ from tfx.orchestration import metadata
 from tfx.types import channel_utils
 from tfx.utils import doc_controls
 
+
 from ml_metadata import errors
 from ml_metadata.proto import metadata_store_pb2
 
@@ -96,21 +97,16 @@ def _prepare_artifact(
           ('Custom property value for key %r must be a string or integer '
            '(got %r instead)') % (key, value))
 
-  """
-  Believe this is where the copying happens @michael
-  """
   unfiltered_previous_artifacts = metadata_handler.get_artifacts_by_uri(uri)
   new_artifact_type = False
   if mlmd_artifact_type and not mlmd_artifact_type.id:
     try:
       mlmd_artifact_type = metadata_handler.store.get_artifact_type(
           mlmd_artifact_type.name)
+      print("From Importer: " + mlmd_artifact_type)
     except errors.NotFoundError:
       # Artifact type is not registered, so it must be new.
       new_artifact_type = True
-  """
-  Believe this is where the copying happens @michael
-  """
 
   result = output_artifact_class(mlmd_artifact_type)
   result.uri = uri
@@ -247,6 +243,8 @@ class ImporterDriver(base_driver.BaseDriver):
 
     output_dict[output_key] = channel_utils.as_channel(
         output_artifacts[output_key])
+
+    # breakpoint()
 
     return data_types.ExecutionDecision(
         input_dict={},

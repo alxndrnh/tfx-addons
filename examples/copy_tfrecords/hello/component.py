@@ -39,7 +39,7 @@ class HelloComponentSpec(types.ComponentSpec):
   PARAMETERS = {
       # These are parameters that will be passed in the call to
       # create an instance of this component.
-      'name': ExecutionParamseter(type=str),
+      'name': ExecutionParameter(type=str),
       'splits': ExecutionParameter(type=dict)
   }
   INPUTS = {
