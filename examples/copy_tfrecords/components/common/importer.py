@@ -61,7 +61,8 @@ def _prepare_artifact(
     uri: str,
     properties: Dict[str, Any],
     custom_properties: Dict[str, Any],
-    reimport: bool, output_artifact_class: Type[types.Artifact],
+    reimport: bool, 
+    output_artifact_class: Type[types.Artifact],
     mlmd_artifact_type: Optional[metadata_store_pb2.ArtifactType]
 ) -> types.Artifact:
   """Prepares the Importer's output artifact.
@@ -151,17 +152,6 @@ def _prepare_artifact(
 
   return result
 
-
-def generate_output_dict(
-    metadata_handler: metadata.Metadata,
-    uri: str,
-    properties: Dict[str, Any],
-    custom_properties: Dict[str, Any],
-    reimport: bool,
-    output_artifact_class: Type[types.Artifact],
-    mlmd_artifact_type: Optional[metadata_store_pb2.ArtifactType] = None,
-    output_key: Optional[str] = None,
-) -> Dict[str, List[types.Artifact]]:
   """Generates Importer's output dict.
 
   If there is already an artifact in MLMD with the same URI and properties /
@@ -186,6 +176,17 @@ def generate_output_dict(
   Returns:
     A dictionary with the only key `output_key` whose value is the Artifact.
   """
+  
+def generate_output_dict(
+    metadata_handler: metadata.Metadata,
+    uri: str,
+    properties: Dict[str, Any],
+    custom_properties: Dict[str, Any],
+    reimport: bool,
+    output_artifact_class: Type[types.Artifact],
+    mlmd_artifact_type: Optional[metadata_store_pb2.ArtifactType] = None,
+    output_key: Optional[str] = None,
+) -> Dict[str, List[types.Artifact]]:
   output_key = output_key or IMPORT_RESULT_KEY
   return {
       output_key: [

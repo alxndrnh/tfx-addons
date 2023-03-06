@@ -22,7 +22,7 @@ an example and will not be supported by TFX team.
 
 import json
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Type, Union
 
 
 from tfx import types
@@ -31,51 +31,64 @@ from tfx.dsl.io import fileio
 from tfx.types import artifact_utils
 from tfx.utils import io_utils
 
+from ml_metadata import errors
+from ml_metadata.proto import metadata_store_pb2
+
+import absl
+from tfx import types
+from tfx.dsl.components.base import base_driver
+from tfx.dsl.components.base import base_node
+from tfx.orchestration import data_types
+from tfx.orchestration import metadata
+from tfx.types import channel_utils
+from tfx.utils import doc_controls
+
+
+from ml_metadata import errors
+from ml_metadata.proto import metadata_store_pb2
+
 
 class Executor(base_executor.BaseExecutor):
   """Executor for HelloComponent."""
-
-  
-
-  def Do(self, input_dict: Dict[str, List[types.Artifact]],
+  def Do(self,
+         input_dict: Dict[str, List[types.Artifact]],
          output_dict: Dict[str, List[types.Artifact]],
          exec_properties: Dict[str, Any]) -> None:
-    """Copy the input_data to the output_data.
-
-    For this example that is all that the Executor does.  For a different
-    custom component, this is where the real functionality of the component
-    would be included.
-
-    This component both reads and writes Examples, but a different component
-    might read and write artifacts of other types.
-
-    Args:
-      input_dict: Input dict from input key to a list of artifacts, including:
-        - input_data: A list of type `standard_artifacts.Examples` which will
-          often contain two splits, 'train' and 'eval'.
-      output_dict: Output dict from key to a list of artifacts, including:
-        - output_data: A list of type `standard_artifacts.Examples` which will
-          usually contain the same splits as input_data.
-      exec_properties: A dict of execution properties, including:
-        - name: Optional unique name. Necessary iff multiple Hello components
-          are declared in the same pipeline.
-
-    Returns:
-      None
-
-    Raises:
-      OSError and its subclasses
-    """
-
+    
     print("From executor.py: " + str(exec_properties))
-
     self._log_startup(input_dict, output_dict, exec_properties)
+
+    metadata_handler= metadata.Metadata
+    mlmd_artifact_type= metadata_store_pb2.ArtifactType
+    print("metadata_handler: " + str(metadata_handler))
+    print("mlmd_artifact_type: " + str(mlmd_artifact_type))
+
+    # mlmd_artifact_type.name = "CopyRecords"
+    # mlmd_artifact_type.properties["split"] = metadata_store_pb2.STRING
+    # data_type_id = metadata.store.put_artifact_type(mlmd_artifact_type)
+    data_type_id = metadata_handler.store
+    print("data_type_id: " + str(data_type_id))
+
+    # mlmd_artifact_type_id = metadata_handler.publish_artifacts(mlmd_artifact_type)
+    # print("data_type_id: " + str(mlmd_artifact_type_id))
+
+
+
+
+
+
+
+
+
 
     input_artifact = artifact_utils.get_single_instance(
         input_dict['input_data'])
+    print("Hello from input_artifact: " + str(input_artifact))
     output_artifact = artifact_utils.get_single_instance(
         output_dict['output_data'])
+    print("Hello from output_artifact: " + str(output_artifact))
     output_artifact.split_names = input_artifact.split_names
+    print("Hello from output_artifact.split_names: " + str(output_artifact.split_names))
 
     split_to_instance = {}
 
