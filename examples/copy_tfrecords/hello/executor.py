@@ -23,6 +23,7 @@ an example and will not be supported by TFX team.
 import json
 import os
 import tempfile
+import shutil
 from typing import Any, Dict, List, Optional, Type, Union
 
 
@@ -57,61 +58,70 @@ class Executor(base_executor.BaseExecutor):
          exec_properties: Dict[str, Any]) -> None:
 
 
+    """Create directory structure of Examples Artifact"""
+    split_names=''
+
+    def _parse_tfrecords_dict(tfrecords_dict: dict, split_names: str):
+        counter = 1
+        tfrecords_dict = exec_properties['tfrecords_dict']
+        print(tfrecords_dict)
+
+        destination_examples_artifact_uri = './examples_imported'
+        print(destination_examples_artifact_uri)
+
+        if not os.path.exists(destination_examples_artifact_uri):
+            os.mkdir(destination_examples_artifact_uri)
+
+
+        # Create a folder in destination_examples_artifact_uri for every key name
+        for key in tfrecords_dict:
+              split_name_temp = "Split-"+key
+              path = os.path.join(destination_examples_artifact_uri, split_name_temp)
+              if not os.path.exists(path):
+                  os.mkdir(path)
+              shutil.copy(tfrecords_dict[key], path)
+
+
+        # Create split_names string
+        for key in tfrecords_dict:
+            if(counter==1):
+                split_names+='["'+key+'","'
+                counter=counter+1
+            elif(counter==2):
+                split_names+=key+'"]'
+            else:
+                split_names+=key+','
+                counter=counter+1
+
+
+    def _set_artifact_properties(artifact: types.Artifact,
+                                properties: Optional[Dict[str, Any]],
+                                custom_properties: Optional[Dict[str, Any]]):
+      """Sets properties and custom_properties to the given artifact."""
+      if properties is not None:
+        for key, value in properties.items():
+          setattr(artifact, key, value)
+      if custom_properties is not None:
+        for key, value in custom_properties.items():
+          if isinstance(value, int):
+            artifact.set_int_custom_property(key, value)
+          elif isinstance(value, (str, bytes)):
+            artifact.set_string_custom_property(key, value)
+          else:
+            raise NotImplementedError(
+                f'Unexpected custom_property value type:{type(value)}')
+          
+
+
+    _parse_tfrecords_dict(exec_properties['tfrecords_dict'], split_names)
+
+
     artifact = types.standard_artifacts.Examples
     artifact.is_external = True
-
     properties={"split_names": '["train","eval"]'}
     custom_properties={}
 
-    print("From executor.py before if statement: " + str(artifact))
-
-    if properties is not None:
-      for key, value in properties.items():
-        setattr(artifact, key, value)
-    if custom_properties is not None:
-      for key, value in custom_properties.items():
-        if isinstance(value, int):
-          artifact.set_int_custom_property(key, value)
-        elif isinstance(value, (str, bytes)):
-          artifact.set_string_custom_property(key, value)
-        else:
-          raise NotImplementedError(
-              f'Unexpected custom_property value type:{type(value)}')
-        
-    print("From str(artifact.type) after if statement: " + str(artifact.type))
-    print("From str(artifact.split_names) after if statement: " + str(artifact.split_names))
-    # print("From executor.py after if statement: " + str(artifact.span))
-    print("From str(artifact.uri) after if statement: " + str(artifact.uri))
-
-
-
-    # absl.logging.info(
-    #   'Processing source uri: %s, properties: %s, custom_properties: %s' %
-    #   ('./examples/', properties, custom_properties))
-    
-    # print("From executor.py: " + str(exec_properties))
-    # self._log_startup(input_dict, output_dict, exec_properties)
-
-    # metadata_handler= metadata.Metadata
-    # mlmd_artifact_type= metadata_store_pb2.ArtifactType
-    # print("metadata_handler: " + str(metadata_handler))
-    # print("mlmd_artifact_type: " + str(mlmd_artifact_type))
-
-
-
-    # mlmd_artifact_type.name = "CopyRecords"
-    # mlmd_artifact_type.properties["split"] = metadata_store_pb2.STRING
-    # data_type_id = metadata.store.put_artifact_type(mlmd_artifact_type)
-    # data_type_id = metadata_handler.store
-    # print("data_type_id: " + str(data_type_id))
-
-    # mlmd_artifact_type_id = metadata_handler.publish_artifacts(mlmd_artifact_type)
-    # print("data_type_id: " + str(mlmd_artifact_type_id))
-
-
-
-
-
+    _set_artifact_properties(artifact, properties, custom_properties)
 
 
 
@@ -139,3 +149,30 @@ class Executor(base_executor.BaseExecutor):
         input_uri = os.path.join(input_dir, filename)
         output_uri = os.path.join(output_dir, filename)
         io_utils.copy_file(src=input_uri, dst=output_uri, overwrite=True)
+
+
+    # absl.logging.info(
+    #   'Processing source uri: %s, properties: %s, custom_properties: %s' %
+    #   ('./examples/', properties, custom_properties))
+    
+    # print("From executor.py: " + str(exec_properties))
+    # self._log_startup(input_dict, output_dict, exec_properties)
+
+    # metadata_handler= metadata.Metadata
+    # mlmd_artifact_type= metadata_store_pb2.ArtifactType
+    # print("metadata_handler: " + str(metadata_handler))
+    # print("mlmd_artifact_type: " + str(mlmd_artifact_type))
+
+
+
+    # mlmd_artifact_type.name = "CopyRecords"
+    # mlmd_artifact_type.properties["split"] = metadata_store_pb2.STRING
+    # data_type_id = metadata.store.put_artifact_type(mlmd_artifact_type)
+    # data_type_id = metadata_handler.store
+    # print("data_type_id: " + str(data_type_id))
+
+    # mlmd_artifact_type_id = metadata_handler.publish_artifacts(mlmd_artifact_type)
+    # print("data_type_id: " + str(mlmd_artifact_type_id))
+
+
+

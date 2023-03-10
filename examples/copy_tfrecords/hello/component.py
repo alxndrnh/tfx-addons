@@ -34,7 +34,7 @@ class HelloComponent(base_component.BaseComponent):
                input_data: types.Channel = None,
                output_data: types.Channel = None,
                tfrecords_dict: dict = None):
-
+    
     if not output_data:
       output_data = channel_utils.as_channel([standard_artifacts.Examples()])
 
