@@ -49,14 +49,20 @@ from copy_example_gen import component
 
 def _create_pipeline(pipeline_name: str, pipeline_root: str, data_root: str,
                      metadata_path: str) -> tfx.dsl.Pipeline:
-  
-#   example_gen = tfx.components.CsvExampleGen(input_base=data_root)
+
+  #   example_gen = tfx.components.CsvExampleGen(input_base=data_root)
   tfrecords_dict: Dict[str, str]={
     "train":'gs://vertex-test-bucket-tfx/examples/Split-train/',
     "eval":'gs://vertex-test-bucket-tfx/examples/Split-eval/',
   }
 
-  copy_example=component.CopyExampleGen(input_dict=tfrecords_dict)
+  json_str = json.dumps(tfrecords_dict) 
+  print("tfrecords_dict to JSON str: " + json_str)
+  print("tfrecords_dict to JSON str: " + str(type(json_str)))
+
+
+
+  copy_example=component.CopyExampleGen(input_json_str=json.dumps(tfrecords_dict) )
 
 
   # Test downstream component

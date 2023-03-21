@@ -7,6 +7,7 @@ from google.cloud import aiplatform
 from google.cloud.aiplatform import pipeline_jobs
 import logging
 from copy_example_gen import component
+import json
 
 
 # cwd = os.getcwd()
@@ -45,20 +46,25 @@ def _create_pipeline(pipeline_name: str, pipeline_root: str, data_root: str,
                      ) -> tfx.dsl.Pipeline:
   # Brings data into the pipeline.
   # User input dictionary with split-names and their resepctive uri to tfrecords
-  tfrecords_dict: Dict[str, str]={
-    "train":'gs://vertex-test-bucket-tfx/examples/Split-train/',
-    "eval":'gs://vertex-test-bucket-tfx/examples/Split-eval/',
-  }
+#   tfrecords_dict: Dict[str, str]={
+#     "train":'gs://vertex-test-bucket-tfx/examples/Split-train/',
+#     "eval":'gs://vertex-test-bucket-tfx/examples/Split-eval/',
+#   }
 
-  # copy_example = component.CopyExampleGen(
-  #     input_dict=tfrecords_dict
-  # )
+#   json_str = json.dumps(tfrecords_dict)
+
+#   copy_example = component.CopyExampleGen(
+#       input_dict=tfrecords_dict
+#   )
+#   copy_example = component.CopyExampleGen(
+#       input_json_str=json_str
+#   )
   example_gen = tfx.components.CsvExampleGen(input_base=data_root)
 
   # Uses user-provided Python function that trains a model.
   trainer = tfx.components.Trainer(
       module_file=module_file,
-      # examples=copy_example.outputs['output_example'],
+    #   examples=copy_example.outputs['output_example'],
       examples=example_gen.outputs['examples'],
       train_args=tfx.proto.TrainArgs(num_steps=100),
       eval_args=tfx.proto.EvalArgs(num_steps=5))
@@ -72,7 +78,7 @@ def _create_pipeline(pipeline_name: str, pipeline_root: str, data_root: str,
 
   # Following three components will be included in the pipeline.
   components = [
-      # copy_example,
+    #   copy_example,
       example_gen,
       trainer,
       pusher,
@@ -87,7 +93,7 @@ def _create_pipeline(pipeline_name: str, pipeline_root: str, data_root: str,
 PIPELINE_DEFINITION_FILE = PIPELINE_NAME + '_pipeline.json'
 
 runner = tfx.orchestration.experimental.KubeflowV2DagRunner(
-    config=tfx.orchestration.experimental.KubeflowV2DagRunnerConfig(default_image='us-west1-docker.pkg.dev/alex-tfx-dev/docker/custom-component-image'),
+    config=tfx.orchestration.experimental.KubeflowV2DagRunnerConfig(default_image='us-west1-docker.pkg.dev/alex-tfx-dev/docker/custom-component-image-str-input'),
     output_filename=PIPELINE_DEFINITION_FILE)
 # Following function will write the pipeline definition to PIPELINE_DEFINITION_FILE.
 _ = runner.run(

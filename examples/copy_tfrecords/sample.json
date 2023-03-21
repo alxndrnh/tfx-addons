@@ -1,0 +1,1 @@
+{"train": "gs://vertex-test-bucket-tfx/examples/Split-train/", "eval": "gs://vertex-test-bucket-tfx/examples/Split-eval/"}
